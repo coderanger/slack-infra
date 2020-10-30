@@ -17,9 +17,12 @@ limitations under the License.
 package slack
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+
+	secretmanager "cloud.google.com/go/secretmanager/apiv1"
+	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 )
 
 // Config is the information needed to communicate with Slack.
@@ -30,13 +33,31 @@ type Config struct {
 }
 
 // LoadConfig loads a Config from a JSON file.
-func LoadConfig(path string) (Config, error) {
+func LoadConfig(appName string) (Config, error) {
 	config := Config{}
-	content, err := ioutil.ReadFile(path)
+	// content, err := ioutil.ReadFile(path)
+	// if err != nil {
+	// 	return config, fmt.Errorf("couldn't open file: %v", err)
+	// }
+
+	ctx := context.Background()
+	client, err := secretmanager.NewClient(ctx)
 	if err != nil {
-		return config, fmt.Errorf("couldn't open file: %v", err)
+		return config, fmt.Errorf("failed to create secretmanager client: %v", err)
 	}
-	if err := json.Unmarshal(content, &config); err != nil {
+
+	// Build the request.
+	req := &secretmanagerpb.AccessSecretVersionRequest{
+		Name: fmt.Sprintf("projects/cncf-slack-infra/secrets/%s/versions/latest", appName),
+	}
+
+	// Call the API.
+	result, err := client.AccessSecretVersion(ctx, req)
+	if err != nil {
+		return config, fmt.Errorf("failed to access secret version: %v", err)
+	}
+
+	if err := json.Unmarshal(result.Payload.Data, &config); err != nil {
 		return config, fmt.Errorf("couldn't parse config: %v", err)
 	}
 	return config, nil

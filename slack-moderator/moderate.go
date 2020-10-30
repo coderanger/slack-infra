@@ -41,10 +41,10 @@ func (h *handler) handleModerateMessage(interaction slackInteraction, rw http.Re
 				Label: "No",
 				Value: "no",
 			},
-			{
-				Label: "Yes",
-				Value: "yes",
-			},
+			// {
+			// 	Label: "Yes",
+			// 	Value: "yes",
+			// },
 		},
 		Value: "no",
 	}

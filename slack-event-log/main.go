@@ -60,7 +60,7 @@ func runServer(client *slack.Client) {
 
 func main() {
 	o := parseFlags()
-	c, err := slack.LoadConfig(o.configPath)
+	c, err := slack.LoadConfig("slack-event-log")
 	if err != nil {
 		log.Fatalf("Failed to load config from %s: %v", o.configPath, err)
 	}

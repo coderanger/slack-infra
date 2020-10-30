@@ -73,16 +73,16 @@ func loadAdminToken(path string) (string, error) {
 
 func main() {
 	o := parseFlags()
-	c, err := slack.LoadConfig(o.configPath)
+	c, err := slack.LoadConfig("slack-moderator")
 	if err != nil {
 		log.Fatalf("Failed to load config from %s: %v", o.configPath, err)
 	}
-	adminToken, err := loadAdminToken(o.configPath)
-	if err != nil {
-		log.Fatalf("Failed to load admin token from %s: %v", o.configPath, err)
-	}
+	// adminToken, err := loadAdminToken(o.configPath)
+	// if err != nil {
+	// 	log.Fatalf("Failed to load admin token from %s: %v", o.configPath, err)
+	// }
 	s := slack.New(c)
 
-	h := &handler{client: s, adminToken: adminToken}
+	h := &handler{client: s, adminToken: ""}
 	log.Fatal(runServer(h))
 }
